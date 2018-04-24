@@ -146,7 +146,7 @@ var nToTribonacciValidMap = map[string]string{
 
 func TestNIsValidNumber(t *testing.T) {
 
-	for n, tribonachiVal := range nToTribonacciValidMap {
+	for n, expectedTribonacci := range nToTribonacciValidMap {
 
 		request := buldGetRequest(fmt.Sprintf("/tribonacci/%s", n))
 
@@ -155,7 +155,7 @@ func TestNIsValidNumber(t *testing.T) {
 		expectedTribResponse := TribonacciResponse{
 			Code: StatusOK,
 			Desc: StatusText(StatusOK),
-			Data: map[string]*big.Int{"n": strToBigInt(n), "tribonacci": strToBigInt(tribonachiVal)}}
+			Data: map[string]*big.Int{"n": strToBigInt(n), "tribonacci": strToBigInt(expectedTribonacci)}}
 
 		checkResponse(t, response, http.StatusOK, &expectedTribResponse)
 	}

@@ -84,8 +84,15 @@ func handleTribonacciRequest(w http.ResponseWriter, r *http.Request) {
 	tribonacci, err := calculateTribValue(nInt, maxTribonacciCalcTimeInMs)
 
 	if err != nil {
-		outputInvalidResult(w, StatusMaxExecutionTimeExceeded)
-		return
+
+		switch err {
+		case errMaxExecTimeExceeded:
+			outputInvalidResult(w, StatusMaxExecutionTimeExceeded)
+			return
+		default:
+			outputInvalidResult(w, StatusInternalServerError)
+			return
+		}
 	}
 
 	outputSuccessResult(w, nInt, tribonacci)
@@ -104,16 +111,17 @@ func calculateTribValue(n int, maxExecTimeInMillisec int) (*big.Int, error) {
 
 	done := make(chan struct{})
 
-	tribonacciValue := big.NewInt(0)
+	var tribonacciValue *big.Int
+	var calculationError error
 
 	go func() {
-		tribonacciValue = tribonacci.Matrix(n)
+		tribonacciValue, calculationError = tribonacci.Matrix(n)
 		close(done)
 	}()
 
 	select {
 	case <-done:
-		return tribonacciValue, nil
+		return tribonacciValue, calculationError
 	case <-time.After(time.Duration(maxExecTimeInMillisec) * time.Millisecond):
 		return tribonacciValue, errMaxExecTimeExceeded
 	}
