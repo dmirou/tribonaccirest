@@ -8,8 +8,13 @@
 // where
 // "code" is one of status codes,
 // "desc" is text of status with specified code,
-// "data" is result array, which contain "n" and "tribonachi" keys, if request
+// "data" is result array, which contain "n" and "tribonacci" keys, if request
 // successfully processed.
+//
+// Max calculation time of one tribonacci number is 4 seconds (4000 ms). If the calculation
+// is more than 4 seconds you receive the result with code 460 and empty data.
+// You can change max calculation time by changing the constant
+// "maxTribonacciCalcTimeInMs" in app.go
 package main
 
 func main() {

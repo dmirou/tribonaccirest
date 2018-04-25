@@ -109,13 +109,14 @@ func outputInvalidResult(w http.ResponseWriter, code int) {
 
 func calculateTribValue(n int, maxExecTimeInMillisec int) (*big.Int, error) {
 
-	done := make(chan struct{})
+	quit := make(chan bool)
+	done := make(chan bool)
 
 	var tribonacciValue *big.Int
 	var calculationError error
 
 	go func() {
-		tribonacciValue, calculationError = tribonacci.Matrix(n)
+		tribonacciValue, calculationError = tribonacci.MatrixManaged(n, quit)
 		close(done)
 	}()
 
@@ -123,6 +124,7 @@ func calculateTribValue(n int, maxExecTimeInMillisec int) (*big.Int, error) {
 	case <-done:
 		return tribonacciValue, calculationError
 	case <-time.After(time.Duration(maxExecTimeInMillisec) * time.Millisecond):
+		close(quit)
 		return tribonacciValue, errMaxExecTimeExceeded
 	}
 }
